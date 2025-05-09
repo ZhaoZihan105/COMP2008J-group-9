@@ -62,6 +62,10 @@ public class Tile {
         playersOnTile.remove(player);
     }
 
+    public void setState(TileState state) {
+        this.state = state;
+    }
+
     // Getters
     public TileType getType() {
         return type;

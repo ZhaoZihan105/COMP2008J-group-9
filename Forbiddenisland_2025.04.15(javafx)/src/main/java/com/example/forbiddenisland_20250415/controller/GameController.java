@@ -4,6 +4,11 @@ import com.example.forbiddenisland_20250415.model.*;
 import com.example.forbiddenisland_20250415.view.*;
 import javafx.application.Platform;
 import java.util.*;
+import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
+import javafx.geometry.Pos;
+import java.io.File;
+import javafx.scene.control.Alert;
 
 /**
  * 游戏控制器类，处理UI与游戏模型之间的交互
@@ -22,9 +27,35 @@ public class GameController {
      */
     public void startGame(int numPlayers, int difficultyLevel) {
         game.initialize(numPlayers, difficultyLevel);
+        
+        // 添加存档和读档按钮
+        Button saveButton = new Button("保存游戏");
+        saveButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 8 20;");
+        saveButton.setOnAction(e -> {
+            SaveManager.saveGame(game);
+            showMessage("游戏已保存");
+        });
+        
+        Button loadButton = new Button("读取存档");
+        loadButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 8 20;");
+        loadButton.setOnAction(e -> {
+            File saveFile = SaveDialog.show();
+            if (saveFile != null) {
+                SaveData saveData = SaveManager.loadGame(saveFile);
+                if (saveData != null) {
+                    loadGame(saveData);
+                    showMessage("游戏已加载");
+                }
+            }
+        });
+        
+        // 将按钮添加到界面
+        HBox saveLoadBox = new HBox(10);
+        saveLoadBox.setAlignment(Pos.CENTER);
+        saveLoadBox.getChildren().addAll(saveButton, loadButton);
+        gui.getControlPanel().addSaveLoadButtons(saveLoadBox);
+        
         updateGUI();
-        gui.getLogPanel().addLog("游戏开始！难度级别: " + difficultyLevel);
-        gui.getLogPanel().addLog(game.getCurrentPlayer().getRole().getTitle() + "的回合开始");
     }
 
     /**
@@ -315,5 +346,114 @@ public class GameController {
         gui.getIslandPanel().clearSelection();
         gui.getPlayerPanel().clearSelection();
         gui.getLogPanel().addLog("清除了所有选择");
+    }
+
+    private void initializeGame() {
+        // 添加存档按钮
+        Button saveButton = new Button("保存游戏");
+        saveButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 8 20;");
+        saveButton.setOnAction(e -> {
+            SaveManager.saveGame(game);
+            showMessage("游戏已保存");
+        });
+        
+        // 添加读档按钮
+        Button loadButton = new Button("读取存档");
+        loadButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 8 20;");
+        loadButton.setOnAction(e -> {
+            File saveFile = SaveDialog.show();
+            if (saveFile != null) {
+                SaveData saveData = SaveManager.loadGame(saveFile);
+                if (saveData != null) {
+                    loadGame(saveData);
+                    showMessage("游戏已加载");
+                }
+            }
+        });
+        
+        // 将按钮添加到界面
+        HBox saveLoadBox = new HBox(10);
+        saveLoadBox.setAlignment(Pos.CENTER);
+        saveLoadBox.getChildren().addAll(saveButton, loadButton);
+    }
+    
+    private void loadGame(SaveData saveData) {
+        // 重新初始化游戏
+        game.initialize(saveData.getNumPlayers(), saveData.getDifficultyLevel());
+        
+        // 恢复游戏状态
+        game.setCurrentPlayerIndex(saveData.getCurrentPlayerIndex());
+        game.setActionsRemaining(saveData.getActionsRemaining());
+        game.setCurrentPhase(saveData.getCurrentPhase());
+        game.setGameOver(saveData.isGameOver());
+        game.setGameWon(saveData.isGameWon());
+        game.getWaterMeter().setLevel(saveData.getWaterLevel());
+        
+        // 恢复玩家数据
+        for (int i = 0; i < saveData.getPlayers().size(); i++) {
+            SaveData.PlayerData playerData = saveData.getPlayers().get(i);
+            Player player = game.getPlayers().get(i);
+            
+            // 恢复玩家位置
+            for (Tile tile : game.getGameData().getIsland()) {
+                if (tile.getType() == playerData.currentTile) {
+                    player.setCurrentTile(tile);
+                    break;
+                }
+            }
+            
+            // 恢复玩家手牌
+            player.getHand().clear();
+            for (SaveData.TreasureCardData cardData : playerData.hand) {
+                TreasureCard card = new TreasureCard(cardData.type, cardData.name);
+                player.getHand().add(card);
+            }
+            
+            // 恢复特殊能力使用状态
+            player.setHasUsedSpecialAction(playerData.hasUsedSpecialAction);
+        }
+        
+        // 恢复岛屿数据
+        for (int i = 0; i < saveData.getIsland().size(); i++) {
+            SaveData.TileData tileData = saveData.getIsland().get(i);
+            Tile tile = game.getGameData().getIsland().get(i);
+            tile.setState(tileData.state);
+        }
+        
+        // 恢复宝藏卡牌数据
+        game.getGameData().getTreasureDeck().getCards().clear();
+        for (SaveData.TreasureCardData cardData : saveData.getTreasureDeck()) {
+            TreasureCard card = new TreasureCard(cardData.type, cardData.name);
+            game.getGameData().getTreasureDeck().getCards().add(card);
+        }
+        
+        // 恢复洪水卡牌数据
+        game.getGameData().getFloodDeck().getCards().clear();
+        for (SaveData.FloodCardData cardData : saveData.getFloodDeck()) {
+            FloodCard card = new FloodCard(cardData.tileType);
+            game.getGameData().getFloodDeck().getCards().add(card);
+        }
+        
+        // 恢复已捕获的宝藏
+        for (Map.Entry<Treasure, Boolean> entry : saveData.getCapturedTreasures().entrySet()) {
+            if (entry.getValue()) {
+                game.getGameData().captureTreasure(entry.getKey());
+            }
+        }
+        
+        // 更新界面
+        updateGUI();
+        gui.getLogPanel().addLog("游戏已加载");
+        gui.getLogPanel().addLog(game.getCurrentPlayer().getRole().getTitle() + "的回合开始");
+    }
+
+    private void showMessage(String message) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("提示");
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
     }
 }

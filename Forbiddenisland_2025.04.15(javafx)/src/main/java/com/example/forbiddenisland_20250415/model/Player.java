@@ -79,8 +79,12 @@ public class Player {
         return hasUsedSpecialAction;
     }
 
+    public void setHasUsedSpecialAction(boolean hasUsedSpecialAction) {
+        this.hasUsedSpecialAction = hasUsedSpecialAction;
+    }
+
     public void useSpecialAction() {
-        hasUsedSpecialAction = true;
+        this.hasUsedSpecialAction = true;
     }
 
     // Getters and setters

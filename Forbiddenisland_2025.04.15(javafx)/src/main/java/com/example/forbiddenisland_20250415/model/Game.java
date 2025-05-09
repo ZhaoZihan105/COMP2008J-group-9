@@ -667,4 +667,21 @@ public class Game {
         selectedCard = null;
         selectedPlayers.clear();
     }
+
+    public int getCurrentPlayerIndex() {
+        return currentPlayerIndex;
+    }
+
+    public void setCurrentPlayerIndex(int index) {
+        this.currentPlayerIndex = index;
+        this.currentPlayer = players.get(index);
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
+    public void setGameWon(boolean gameWon) {
+        this.gameWon = gameWon;
+    }
 }

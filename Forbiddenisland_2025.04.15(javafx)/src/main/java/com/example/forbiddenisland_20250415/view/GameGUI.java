@@ -30,6 +30,7 @@ public class GameGUI {
     private ActionPanel actionPanel;
     private ConfigPanel configPanel;
     private LogPanel logPanel;
+    private ControlPanel controlPanel;
 
     // 控制器引用
     private GameController gameController;
@@ -64,6 +65,7 @@ public class GameGUI {
         infoPanel = new InfoPanel();
         actionPanel = new ActionPanel();
         logPanel = new LogPanel();
+        controlPanel = new ControlPanel();
 
         // 应用直接样式，不依赖CSS
         applyPanelStyles();
@@ -76,7 +78,7 @@ public class GameGUI {
 
         VBox leftPanel = new VBox(15);
         leftPanel.setPadding(new Insets(0, 0, 0, 0));
-        leftPanel.getChildren().addAll(playerPanel, logPanel);
+        leftPanel.getChildren().addAll(playerPanel, logPanel, controlPanel);
         VBox.setVgrow(playerPanel, Priority.ALWAYS);
         leftPanel.setPrefWidth(250);
         leftPanel.setEffect(panelShadow);
@@ -189,6 +191,7 @@ public class GameGUI {
         infoPanel.setStyle(titledPaneStyle);
         actionPanel.setStyle(titledPaneStyle);
         logPanel.setStyle(titledPaneStyle);
+        controlPanel.setStyle(titledPaneStyle);
 
         // 使用Platform.runLater等待JavaFX完成标题节点的渲染
         javafx.application.Platform.runLater(() -> {
@@ -215,6 +218,8 @@ public class GameGUI {
                     actionPanel.lookup(".title").setStyle(titledPaneTitleStyle);
                 if (logPanel.lookup(".title") != null)
                     logPanel.lookup(".title").setStyle(titledPaneTitleStyle);
+                if (controlPanel.lookup(".title") != null)
+                    controlPanel.lookup(".title").setStyle(titledPaneTitleStyle);
             } catch (Exception e) {
                 System.err.println("无法应用标题样式: " + e.getMessage());
             }
@@ -287,6 +292,10 @@ public class GameGUI {
 
     public LogPanel getLogPanel() {
         return logPanel;
+    }
+
+    public ControlPanel getControlPanel() {
+        return controlPanel;
     }
 
     /**

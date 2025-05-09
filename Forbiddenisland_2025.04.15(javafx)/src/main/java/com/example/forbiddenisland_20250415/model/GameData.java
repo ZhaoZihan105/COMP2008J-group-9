@@ -26,40 +26,34 @@ public class GameData {
     }
 
     public void createIsland() {
-        // 根据游戏说明创建岛屿网格：
-        // 首先在中央创建一个4x4的方格
-        // 然后在每边的中间2个瓦片旁边再各放置2个瓦片
-
-        // 创建所有24个瓦片，随机排序
-        List<TileType> tileTypes = new ArrayList<>(Arrays.asList(TileType.values()));
-        Collections.shuffle(tileTypes);
-
-        // 创建岛屿网格 - 这是一个简化的方法
-        // 实际的网格需要精确匹配游戏的布局
-
+        // 创建所有24个瓦片，使用固定的布局
         // 中央4x4网格
-        for (int row = 0; row < 4; row++) {
-            for (int col = 0; col < 4; col++) {
-                createTile(tileTypes.remove(0), row+1, col+1);
-            }
-        }
+        createTile(TileType.FOOLS_LANDING, 2, 2);
+        createTile(TileType.BRONZE_GATE, 1, 1);
+        createTile(TileType.CORAL_PALACE, 1, 2);
+        createTile(TileType.CAVE_OF_EMBERS, 1, 3);
+        createTile(TileType.CAVE_OF_SHADOWS, 1, 4);
+        createTile(TileType.COPPER_GATE, 2, 1);
+        createTile(TileType.CRIMSON_FOREST, 2, 3);
+        createTile(TileType.DUNES_OF_DECEPTION, 2, 4);
+        createTile(TileType.GOLD_GATE, 3, 1);
+        createTile(TileType.HOWLING_GARDEN, 3, 2);
+        createTile(TileType.IRON_GATE, 3, 3);
+        createTile(TileType.LOST_LAGOON, 3, 4);
+        createTile(TileType.MISTY_MARSH, 4, 1);
+        createTile(TileType.OBSERVATORY, 4, 2);
+        createTile(TileType.PHANTOM_ROCK, 4, 3);
+        createTile(TileType.SILVER_GATE, 4, 4);
 
-        // 额外的瓦片:
-        // 上排
-        createTile(tileTypes.remove(0), 0, 2);
-        createTile(tileTypes.remove(0), 0, 3);
-
-        // 下排
-        createTile(tileTypes.remove(0), 5, 2);
-        createTile(tileTypes.remove(0), 5, 3);
-
-        // 左列
-        createTile(tileTypes.remove(0), 2, 0);
-        createTile(tileTypes.remove(0), 3, 0);
-
-        // 右列
-        createTile(tileTypes.remove(0), 2, 5);
-        createTile(tileTypes.remove(0), 3, 5);
+        // 额外的瓦片
+        createTile(TileType.TEMPLE_OF_THE_MOON, 0, 2);
+        createTile(TileType.TEMPLE_OF_THE_SUN, 0, 3);
+        createTile(TileType.WATCHTOWER, 5, 2);
+        createTile(TileType.WHISPERING_GARDEN, 5, 3);
+        createTile(TileType.BREAKERS_BRIDGE, 2, 0);
+        createTile(TileType.CLIFFS_OF_ABANDON, 3, 0);
+        createTile(TileType.TIDAL_PALACE, 2, 5);
+        createTile(TileType.TWILIGHT_HOLLOW, 3, 5);
 
         // 设置相邻关系
         setupAdjacency();

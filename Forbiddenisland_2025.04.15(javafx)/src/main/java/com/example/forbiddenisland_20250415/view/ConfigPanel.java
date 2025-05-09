@@ -27,6 +27,7 @@ public class ConfigPanel extends TitledPane {
     private ComboBox<Integer> playerCountComboBox;
     private ComboBox<String> difficultyComboBox;
     private Button startButton;
+    private Button rulesButton;
     private ImageView logoImageView;
 
     private GameController controller;
@@ -104,18 +105,31 @@ public class ConfigPanel extends TitledPane {
 
         difficultyBox.getChildren().addAll(difficultyLabel, difficultyComboBox);
 
+        // 创建按钮容器
+        HBox buttonBox = new HBox(10);
+        buttonBox.setAlignment(Pos.CENTER);
+
+        // 创建规则按钮
+        rulesButton = new Button("游戏规则");
+        rulesButton.setPrefWidth(120);
+        rulesButton.setPrefHeight(40);
+        rulesButton.setFont(Font.font("System", FontWeight.BOLD, 14));
+
         // 创建开始按钮
         startButton = new Button("开始冒险");
         startButton.setPrefWidth(120);
         startButton.setPrefHeight(40);
         startButton.setFont(Font.font("System", FontWeight.BOLD, 14));
 
-        // 添加开始按钮的阴影效果
+        // 添加按钮的阴影效果
         DropShadow buttonShadow = new DropShadow();
         buttonShadow.setColor(Color.BLACK);
         buttonShadow.setRadius(5);
         buttonShadow.setOffsetY(2);
+        rulesButton.setEffect(buttonShadow);
         startButton.setEffect(buttonShadow);
+
+        buttonBox.getChildren().addAll(rulesButton, startButton);
 
         // 创建一个填充空间的区域，使按钮靠右对齐
         HBox spacer = new HBox();
@@ -127,13 +141,13 @@ public class ConfigPanel extends TitledPane {
                 playerCountBox,
                 difficultyBox,
                 spacer,
-                startButton
+                buttonBox
         );
 
         setContent(contentPane);
         setCollapsible(false);
 
-        // 设置action listener
+        // 设置action listeners
         startButton.setOnAction(e -> {
             if (controller != null) {
                 int playerCount = playerCountComboBox.getValue();
@@ -141,6 +155,10 @@ public class ConfigPanel extends TitledPane {
                 controller.startGame(playerCount, difficultyLevel);
                 startButton.setDisable(true);
             }
+        });
+
+        rulesButton.setOnAction(e -> {
+            RulesDialog.show();
         });
     }
 
